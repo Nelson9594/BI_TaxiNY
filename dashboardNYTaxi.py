@@ -13,6 +13,7 @@ import pydeck as pdk
 st.title('Business Intelligences Project')
 st.subheader('NY Taxi')
 
+
 # Load the data
 dataset = 'https://raw.githubusercontent.com/uber-web/kepler.gl-data/master/nyctrips/data.csv'
 df = pd.read_csv(dataset, delimiter=',')
@@ -20,12 +21,61 @@ df = pd.read_csv(dataset, delimiter=',')
 # Show the data as a table
 st.write(df)
 
+
+##########################################################################################################
+
+#Metrique 
+st.subheader('Metrique')
+
+columns_dep_retr = ['VendorID', 'tpep_pickup_datetime', 'tpep_dropoff_datetime']
+
+# Selectionne uniquement la compagnie 1
+df_selected_1 = df.loc[df['VendorID'] == 1, columns_dep_retr]
+df_selected_1.head()
+
+df_selected_2 = df.loc[df['VendorID'] == 2, columns_dep_retr]
+
+# Calculer la différence entre la colonne 'tpep_dropoff_datetime' et 'tpep_pickup_datetime' de la compagnie 1
+df_selected_1['duration'] = pd.to_datetime(df_selected_1['tpep_dropoff_datetime']) - pd.to_datetime(df_selected_1['tpep_pickup_datetime'])
+df_selected_2['duration'] = pd.to_datetime(df_selected_2['tpep_dropoff_datetime']) - pd.to_datetime(df_selected_2['tpep_pickup_datetime'])
+
+
+# Calculer la moyenne de la durée des courses
+mean_duration_vendor1 = df_selected_1['duration'].mean()
+mean_duration_vendor2 = df_selected_2['duration'].mean()
+
+mean_duration_seconds = mean_duration_vendor1.total_seconds()
+hours = int(mean_duration_seconds // 3600)
+minutes = int((mean_duration_seconds % 3600) // 60)
+seconds = int(mean_duration_seconds % 60)
+
+mean_duration_seconds_2 = mean_duration_vendor2.total_seconds()
+hours_2 = int(mean_duration_seconds_2 // 3600)
+minutes_2 = int((mean_duration_seconds_2 % 3600) // 60)
+seconds_2 = int(mean_duration_seconds_2 % 60)
+
+col1, col2, col3 = st.columns(3)
+
+col1.metric("Heure", hours)
+col2.metric("Minutes", minutes)
+col3.metric("Secondes", seconds)
+
+col1v2, col2v2, col3v2 = st.columns(3)
+
+col1v2.metric("Heure", hours_2)
+col2v2.metric("Minutes", minutes_2, "1")
+col3v2.metric("Secondes", seconds_2, "38")
+
+
+
+##########################################################################################################
+
 #Comparaison des points de depots et point de retrait
 st.subheader('Comparaison des points de depots et point de retrait')
 
 # Sélectionner les colonnes de latitude et de longitude
 col_long_lat = ['VendorID', 'pickup_longitude', 'pickup_latitude', 'dropoff_longitude', 'dropoff_latitude']
-df_taxi_long_lat = df[col_long_lat]
+df_long_lat = df[col_long_lat]
 
 # Créer la figure et les axes
 fig, ax = plt.subplots(figsize=(15, 15))
@@ -34,10 +84,10 @@ fig, ax = plt.subplots(figsize=(15, 15))
 ax.set_title('Comparaison Point de retrait Bleu - Point de depot Jaune')
 
 # Définir les données pour les axes X et Y
-pickup_x = df_taxi_long_lat['pickup_latitude']
-pickup_y = df_taxi_long_lat['pickup_longitude']
-dropoff_x = df_taxi_long_lat['dropoff_latitude']
-dropoff_y = df_taxi_long_lat['dropoff_longitude']
+pickup_x = df_long_lat['pickup_latitude']
+pickup_y = df_long_lat['pickup_longitude']
+dropoff_x = df_long_lat['dropoff_latitude']
+dropoff_y = df_long_lat['dropoff_longitude']
 
 # Afficher les données sous forme de nuage de points
 ax.scatter(pickup_x, pickup_y, s=0.7, alpha=0.4, c='blue')
@@ -55,7 +105,7 @@ ax.set_ylabel('Longitude')
 st.pyplot(fig)
 
 
-
+###########################################################################################################
 
 
 st.subheader('Vendor 1')
@@ -94,7 +144,7 @@ fig = get_pickup_hours(df_taxi)
 st.pyplot(fig)
 
 
-
+###########################################################################################################
 
 #Comparaison des points de depots et point de retrait
 st.subheader('Heatmap')
@@ -134,8 +184,9 @@ df_taxi = df
 fig = get_passenger_heatmap(df_taxi)
 st.pyplot(fig)
 
+###########################################################################################################
 
-#latitude
+#latitude et longitude 
 st.subheader('Histo Latittude')
 
 
@@ -168,6 +219,9 @@ df_taxi = df
 
 # Créer les histogrammes
 get_dropoff_histograms(df_taxi)
+
+
+###########################################################################################################
 
 
 
