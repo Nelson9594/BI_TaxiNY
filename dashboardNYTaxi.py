@@ -7,12 +7,23 @@ import folium
 from folium.plugins import MarkerCluster
 from folium.plugins import HeatMap
 import pydeck as pdk
+from PIL import Image
 
 
 # Title
-st.title('Business Intelligences Project')
-st.subheader('NY Taxi')
+st.write(
+    '<div style="text-align: center; margin: auto;">'
+    '<h1>Business Intelligences Project</h1>'
+    '<h3>Uber New York</h3>'
+    '</div>',
+    unsafe_allow_html=True
+)
 
+image = Image.open('images/uber.png')
+
+st.image(image)
+
+##########################################
 
 # Load the data
 dataset = 'https://raw.githubusercontent.com/uber-web/kepler.gl-data/master/nyctrips/data.csv'
@@ -21,11 +32,24 @@ df = pd.read_csv(dataset, delimiter=',')
 # Show the data as a table
 st.write(df)
 
+st.write("Le fichier de données au format CSV à l'URL donnée contient des informations sur les voyages en taxi à New York City. Les données ont été collectées par la Commission des taxis et des limousines de la ville de New York, et couvrent les voyages effectués de janvier à juin 2015.")
+
+
 
 ##########################################################################################################
 
+st.write(
+    '<br><br><br>',
+    unsafe_allow_html=True
+)
+
 #Metrique 
 st.subheader('Metrique')
+
+st.write(
+    '<br>',
+    unsafe_allow_html=True
+)
 
 columns_dep_retr = ['VendorID', 'tpep_pickup_datetime', 'tpep_dropoff_datetime']
 
@@ -54,13 +78,19 @@ hours_2 = int(mean_duration_seconds_2 // 3600)
 minutes_2 = int((mean_duration_seconds_2 % 3600) // 60)
 seconds_2 = int(mean_duration_seconds_2 % 60)
 
+st.caption('Durée moyenne de temps de trajet pour la compagnie 1')
+
 col1, col2, col3 = st.columns(3)
 
 col1.metric("Heure", hours)
 col2.metric("Minutes", minutes)
 col3.metric("Secondes", seconds)
 
+
+st.caption('Durée moyenne de temps de trajet pour la compagnie 2')
+
 col1v2, col2v2, col3v2 = st.columns(3)
+
 
 col1v2.metric("Heure", hours_2)
 col2v2.metric("Minutes", minutes_2, "1")
@@ -69,9 +99,27 @@ col3v2.metric("Secondes", seconds_2, "38")
 
 
 ##########################################################################################################
+st.write(
+    '<br><br><br>',
+    unsafe_allow_html=True
+)
 
 #Comparaison des points de depots et point de retrait
 st.subheader('Comparaison des points de depots et point de retrait')
+
+st.write(
+    '<br>',
+    unsafe_allow_html=True
+)
+
+st.text('Colonne selectionné')
+code = '''col_long_lat = ['VendorID', 'pickup_longitude', 'pickup_latitude', 'dropoff_longitude', 'dropoff_latitude']'''
+st.code(code, language='python')
+
+st.write(
+    '<br>',
+    unsafe_allow_html=True
+)
 
 # Sélectionner les colonnes de latitude et de longitude
 col_long_lat = ['VendorID', 'pickup_longitude', 'pickup_latitude', 'dropoff_longitude', 'dropoff_latitude']
@@ -107,9 +155,27 @@ st.pyplot(fig)
 
 ###########################################################################################################
 
+st.write(
+    '<br><br><br>',
+    unsafe_allow_html=True
+)
 
-st.subheader('Vendor 1')
+st.subheader('Course Uber')
 # Définir la fonction pour afficher le graphique
+
+st.write(
+    '<br>',
+    unsafe_allow_html=True
+)
+
+st.write('Dans cette partie nous pouvons visualiser les graphique des deux compagnie opérant dans la ville de New York, ci dessous nous pouvons voir le nombre de course par heure.')
+
+st.text('Les colonnes selectionnés et transformer en dateTime sont : ')
+
+code = "df_taxi_1['tpep_pickup_datetime'] = pd.to_datetime(df_taxi_1['tpep_pickup_datetime'])"
+
+st.code(code, language='python')
+
 def get_pickup_hours(df_taxi):
     df_taxi_1 = df_taxi
     df_taxi_1['tpep_pickup_datetime'] = pd.to_datetime(df_taxi_1['tpep_pickup_datetime'])
@@ -123,21 +189,34 @@ def get_pickup_hours(df_taxi):
     ax.bar(df_count['hour'] + df_count['minute'] / 60, df_count['count'], width=0.01)
     ax.set_xlabel('Heure')
     ax.set_ylabel('Nombre de courses')
-    ax.set_title('Nombre de courses en fonction de l\'heure et de la minute de la prise en charge')
 
     return fig
 
 # Charger les données dans le DataFrame
 df_taxi = df.loc[df['VendorID'] == 1]
 
+
+st.write(
+    '<div style="text-align: center; margin: auto;">'
+    '<h1>Compagnie 1</h1>'
+    '</div>',
+    unsafe_allow_html=True
+)
+
 # Afficher le graphique
 fig = get_pickup_hours(df_taxi)
 st.pyplot(fig)
 
 
-st.subheader('Vendor 2')
 # Charger les données dans le DataFrame
 df_taxi = df.loc[df['VendorID'] == 2]
+
+st.write(
+    '<div style="text-align: center; margin: auto;">'
+    '<h1>Compagnie 2</h1>'
+    '</div>',
+    unsafe_allow_html=True
+)
 
 # Afficher le graphique
 fig = get_pickup_hours(df_taxi)
@@ -146,8 +225,34 @@ st.pyplot(fig)
 
 ###########################################################################################################
 
+st.write(
+    '<br><br><br>',
+    unsafe_allow_html=True
+)
+
 #Comparaison des points de depots et point de retrait
 st.subheader('Heatmap')
+
+st.write(
+    '<br>',
+    unsafe_allow_html=True
+)
+
+st.write("Fréquence de passagers en fonction de l'heure de la prise en charge pour l'ensemble des compagnies")
+
+st.write(
+    '<br>',
+    unsafe_allow_html=True
+)
+
+code = "columns = ['tpep_pickup_datetime', 'passenger_count']"
+
+st.code(code, language='python')
+
+st.write(
+    '<br>',
+    unsafe_allow_html=True
+)
 
 # Définir la fonction pour afficher le graphique
 def get_passenger_heatmap(df_taxi):
@@ -171,7 +276,6 @@ def get_passenger_heatmap(df_taxi):
     # Afficher un heatmap des données
     fig, ax = plt.subplots()
     sns.heatmap(df_pivot, cmap='flare')
-    ax.set_title('Fréquences de passagers en fonction de l\'heure de la prise en charge')
     ax.set_xlabel('Heure')
     ax.set_ylabel('Nombre de passagers')
 
@@ -186,8 +290,20 @@ st.pyplot(fig)
 
 ###########################################################################################################
 
-#latitude et longitude 
-st.subheader('Histo Latittude')
+st.write(
+    '<br><br><br>',
+    unsafe_allow_html=True
+)
+
+#Latitude et Longitude
+st.subheader('Histogramme')
+
+st.write(
+    '<br>',
+    unsafe_allow_html=True
+)
+
+st.write('Ci dessous vous trouverez un Heatmap des fréquences de nombre de passager en fonction des horaires')
 
 
 # Définir la fonction pour créer les histogrammes
